@@ -9,6 +9,7 @@ Welcome to the comprehensive reference and interview prep guide for this microse
 - 🏆 **[Master Technical Interview Guide (`MASTER_INTERVIEW_GUIDE.md`)](file:///c:/SpringBoot/prep/MASTER_INTERVIEW_GUIDE.md)**: Real-world senior interview questions, Point of View (POV) architectural answers, exact code examples from this project, and common follow-up pitfalls across all 11 core architecture domains.
 - ⚙️ **[Configuration Specification Guide (`CONFIGURATION_SPECIFICATION.md`)](file:///c:/SpringBoot/prep/CONFIGURATION_SPECIFICATION.md)**: Line-by-line commented reference for all configurations (Dev vs Prod), property management locations, architectural importance, and production maintenance strategies.
 - 🛠️ **[Production Troubleshooting Guide (`15_production_troubleshooting_guide.md`)](file:///c:/SpringBoot/prep/15_production_troubleshooting_guide.md)**: Master playbook for diagnosing and resolving top 10 heavy multi-instance production microservices failures.
+- 🏗️ **[Step-by-Step Architecture & Build Guide (`16_architecture_build_steps_guide.md`)](file:///c:/SpringBoot/prep/16_architecture_build_steps_guide.md)**: Complete high-level roadmap documenting every architectural decision, database choice, service creation phase, and Angular frontend implementation step from start to finish.
 
 ---
 
@@ -31,3 +32,4 @@ Welcome to the comprehensive reference and interview prep guide for this microse
 | **13** | [Local MySQL Database Integration](file:///c:/SpringBoot/prep/13_local_mysql_database_integration.md) | Docker local MySQL 8.0 setup, `application-mysql.yml` profile, DBeaver/CLI queries. |
 | **14** | [Modern Angular 18 Master Reference](file:///c:/SpringBoot/prep/14_angular_master_reference.md) | Lifecycle hooks, decorators, functional interceptors/guards, RxJS signals, `@defer`. |
 | **15** | [Production Troubleshooting Guide](file:///c:/SpringBoot/prep/15_production_troubleshooting_guide.md) | Top 10 multi-instance production failure scenarios, diagnostics, RCA, and fixes. |
+| **16** | [Architecture & End-to-End Build Steps](file:///c:/SpringBoot/prep/16_architecture_build_steps_guide.md) | High-level roadmap documenting every architectural decision and build phase. |
