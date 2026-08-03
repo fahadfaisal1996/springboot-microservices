@@ -225,3 +225,66 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 1. **Stateless Security (`STATELESS`)**: Spring Security disables HTTP Sessions (`HttpSession`), ensuring every incoming request is evaluated exclusively by its Bearer token.
 2. **Decoupled Verification**: `product-service` shares the exact same secret key (`app.jwt.secret`), enabling it to verify tokens locally without sending requests back to `auth-service`.
 3. **Security Context**: Once verified, the filter populates `SecurityContextHolder.getContext().setAuthentication(...)`, allowing Spring Security annotations and path matchers to enforce access rules.
+
+---
+
+## 🔄 End-to-End Role Lifecycle: From JWT Claims to API Access Control
+
+### Step-by-Step Execution Flow
+
+1. **Token Generation (`auth-service`)**:
+   When a user authenticates, `JwtTokenProvider` extracts their granted authority and embeds it into the signed JWT claims:
+   ```java
+   String role = authentication.getAuthorities().stream()
+           .findFirst()
+           .map(GrantedAuthority::getAuthority)
+           .orElse("ROLE_USER");
+
+   return Jwts.builder()
+           .subject(username)
+           .claim("role", role) // Custom claim inside JWT payload
+           .issuedAt(now)
+           .expiration(expiryDate)
+           .signWith(key())
+           .compact();
+   ```
+
+2. **Claim Extraction & Context Population (`product-service`)**:
+   On every incoming request, `JwtAuthenticationFilter` intercepts the request, verifies the signature, parses the `"role"` claim, and populates Spring Security's `SecurityContext`:
+   ```java
+   Claims claims = Jwts.parser()
+           .verifyWith(key())
+           .build()
+           .parseSignedClaims(jwt)
+           .getPayload();
+
+   String username = claims.getSubject();
+   String role = claims.get("role", String.class); // Extract "ROLE_ADMIN" / "ROLE_USER"
+
+   SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role != null ? role : "ROLE_USER");
+   UsernamePasswordAuthenticationToken authentication =
+           new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(authority));
+
+   SecurityContextHolder.getContext().setAuthentication(authentication);
+   ```
+
+3. **API Access Control Enforcement (`product-service`)**:
+   Spring Security checks the granted authorities stored in `SecurityContextHolder` against HTTP path rules defined in `SecurityConfig`:
+   ```java
+   .authorizeHttpRequests(auth -> auth
+       .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
+       .requestMatchers(HttpMethod.POST, "/api/v1/products/**").hasAuthority("ROLE_ADMIN")
+       .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasAuthority("ROLE_ADMIN")
+       .anyRequest().authenticated()
+   );
+   ```
+
+### 📊 Role-Based Access Enforcement Matrix
+
+| Request Method & Endpoint | User Role | Access Result |
+| :--- | :--- | :--- |
+| `GET /api/v1/products` | Anonymous / Anyone | `200 OK` (Public Read) |
+| `POST /api/v1/products` | Missing Token | `401 Unauthorized` |
+| `POST /api/v1/products` | `ROLE_USER` | `403 Forbidden` |
+| `POST /api/v1/products` | `ROLE_ADMIN` | `201 Created` |
+
