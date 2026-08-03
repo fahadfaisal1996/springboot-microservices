@@ -6,42 +6,44 @@ echo ==============================================================
 echo   Spring Boot 3 Microservices + Kafka + Angular Launcher  
 echo ==============================================================
 
-set JDK_DIR=C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin
-if exist "%JDK_DIR%\java.exe" (
-    set PATH=%JDK_DIR%;%PATH%
-    echo [✓] Java 17 configured.
+set JDK_DIR=C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2
+set MAVEN_DIR=C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.2.6.1\plugins\maven\lib\maven3\bin
+
+if exist "%JDK_DIR%\bin\java.exe" (
+    set JAVA_HOME=%JDK_DIR%
+    set PATH=%JDK_DIR%\bin;%PATH%
+    echo [OK] Java 17 configured.
+)
+
+if exist "%MAVEN_DIR%\mvn.cmd" (
+    set PATH=%MAVEN_DIR%;%PATH%
+    echo [OK] Maven configured.
+)
+
+set ENV_CMD=set JAVA_HOME=C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2^&^& set PATH=C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.2.6.1\plugins\maven\lib\maven3\bin;%%PATH%%
+
+echo.
+where wt >nul 2>nul
+if %ERRORLEVEL% equ 0 (
+    echo [OK] Opening all 6 microservices in a single Windows Terminal window with tabs...
+    echo.
+    wt -d "%~dp0discovery-server" --title "Discovery Server (8761)" cmd /k "%ENV_CMD%&& mvn spring-boot:run" ";" new-tab -d "%~dp0auth-service" --title "Auth Service (8081)" cmd /k "%ENV_CMD%&& mvn spring-boot:run" ";" new-tab -d "%~dp0product-service" --title "Product Service (8082)" cmd /k "%ENV_CMD%&& mvn spring-boot:run" ";" new-tab -d "%~dp0notification-service" --title "Notification Service (8083)" cmd /k "%ENV_CMD%&& mvn spring-boot:run" ";" new-tab -d "%~dp0api-gateway" --title "API Gateway (8080)" cmd /k "%ENV_CMD%&& mvn spring-boot:run" ";" new-tab -d "%~dp0angular-frontend" --title "Angular Frontend (4200)" cmd /k "npm install && npm start"
+) else (
+    echo Opening services in separate terminal windows...
+    start "Discovery Server (8761)" cmd /k "%ENV_CMD%&& cd /d %~dp0discovery-server && mvn spring-boot:run"
+    timeout /t 5 /nobreak
+    start "Auth Service (8081)" cmd /k "%ENV_CMD%&& cd /d %~dp0auth-service && mvn spring-boot:run"
+    start "Product Service (8082)" cmd /k "%ENV_CMD%&& cd /d %~dp0product-service && mvn spring-boot:run"
+    start "Notification Service (8083)" cmd /k "%ENV_CMD%&& cd /d %~dp0notification-service && mvn spring-boot:run"
+    timeout /t 5 /nobreak
+    start "API Gateway (8080)" cmd /k "%ENV_CMD%&& cd /d %~dp0api-gateway && mvn spring-boot:run"
+    timeout /t 5 /nobreak
+    start "Angular Frontend (4200)" cmd /k "cd /d %~dp0angular-frontend && npm install && npm start"
 )
 
 echo.
-echo [1/6] Starting Eureka Discovery Server (Port 8761)...
-start "Discovery Server (8761)" cmd /k "cd /d %~dp0discovery-server && mvn spring-boot:run"
-timeout /t 10 /nobreak
-
-echo.
-echo [2/6] Starting Auth Service (Port 8081)...
-start "Auth Service (8081)" cmd /k "cd /d %~dp0auth-service && mvn spring-boot:run"
-
-echo.
-echo [3/6] Starting Product Service (Port 8082)...
-start "Product Service (8082)" cmd /k "cd /d %~dp0product-service && mvn spring-boot:run"
-
-echo.
-echo [4/6] Starting Notification Service (Port 8083)...
-start "Notification Service (8083)" cmd /k "cd /d %~dp0notification-service && mvn spring-boot:run"
-timeout /t 5 /nobreak
-
-echo.
-echo [5/6] Starting API Gateway (Port 8080)...
-start "API Gateway (8080)" cmd /k "cd /d %~dp0api-gateway && mvn spring-boot:run"
-timeout /t 5 /nobreak
-
-echo.
-echo [6/6] Starting Angular Frontend (Port 4200)...
-start "Angular Frontend (4200)" cmd /k "cd /d %~dp0angular-frontend && npm install && npm start"
-
-echo.
 echo ==============================================================
-echo   All Services Launched in Separate Terminal Windows!
+echo   All Services Launched in Windows Terminal!
 echo   - Discovery Dashboard  : http://localhost:8761
 echo   - API Gateway          : http://localhost:8080
 echo   - Notification Service : http://localhost:8083

@@ -7,14 +7,21 @@ Write-Host "==========================================================" -Foregro
 Write-Host "  Spring Boot Microservices + Angular Learning Suite   " -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Cyan
 
-# Locate Java JDK
+# Locate Java JDK & Maven
 $jdkPath = "C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin"
+$mavenPath = "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.2.6.1\plugins\maven\lib\maven3\bin"
+
 if (Test-Path "$jdkPath\java.exe") {
     $env:Path = "$jdkPath;$env:Path"
     $env:JAVA_HOME = "C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2"
-    Write-Host "[✓] Found Java JDK 17 at: $jdkPath" -ForegroundColor Green
+    Write-Host "[OK] Found Java JDK 17 at: $jdkPath" -ForegroundColor Green
 } else {
     Write-Host "[!] Using default Java from system PATH..." -ForegroundColor Yellow
+}
+
+if (Test-Path "$mavenPath\mvn.cmd") {
+    $env:Path = "$mavenPath;$env:Path"
+    Write-Host "[OK] Found Maven at: $mavenPath" -ForegroundColor Green
 }
 
 java -version
@@ -38,4 +45,18 @@ Write-Host " - API Gateway      : http://localhost:8080"
 Write-Host " - Auth Service     : http://localhost:8081"
 Write-Host " - Product Service  : http://localhost:8082"
 Write-Host " - Angular Frontend : http://localhost:4200"
-Write-Host "`nOpening service terminals..." -ForegroundColor Green
+Write-Host "`nOpening all 6 services in a single Windows Terminal window with tabs..." -ForegroundColor Green
+if (Get-Command wt -ErrorAction SilentlyContinue) {
+    $jdkDir = "C:\Users\Fahad\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2"
+    $mvnDir = "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.2.6.1\plugins\maven\lib\maven3\bin"
+    $envSetup = "set JAVA_HOME=$jdkDir&& set PATH=$jdkDir\bin;$mvnDir;%PATH%"
+
+    wt -d "$PSScriptRoot\discovery-server" --title "Discovery Server (8761)" cmd /k "$envSetup&& mvn spring-boot:run" `
+       `; new-tab -d "$PSScriptRoot\auth-service" --title "Auth Service (8081)" cmd /k "$envSetup&& mvn spring-boot:run" `
+       `; new-tab -d "$PSScriptRoot\product-service" --title "Product Service (8082)" cmd /k "$envSetup&& mvn spring-boot:run" `
+       `; new-tab -d "$PSScriptRoot\notification-service" --title "Notification Service (8083)" cmd /k "$envSetup&& mvn spring-boot:run" `
+       `; new-tab -d "$PSScriptRoot\api-gateway" --title "API Gateway (8080)" cmd /k "$envSetup&& mvn spring-boot:run" `
+       `; new-tab -d "$PSScriptRoot\angular-frontend" --title "Angular Frontend (4200)" cmd /k "npm install && npm start"
+} else {
+    cmd /c "$PSScriptRoot\start-all.bat"
+}

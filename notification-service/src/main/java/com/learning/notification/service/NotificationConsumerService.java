@@ -46,12 +46,14 @@ public class NotificationConsumerService {
                 notification.id(), channel.getChannelName(), formattedRecipient);
     }
 
-    // Pattern matching switch expression on Java 17 Sealed Interface
+    // Standard Java 17 pattern matching with instanceof
     private String processChannel(NotificationChannel channel, String recipient) {
-        return switch (channel) {
-            case EmailNotificationChannel email -> email.formatRecipient(recipient);
-            case SmsNotificationChannel sms -> sms.formatRecipient(recipient);
-        };
+        if (channel instanceof EmailNotificationChannel email) {
+            return email.formatRecipient(recipient);
+        } else if (channel instanceof SmsNotificationChannel sms) {
+            return sms.formatRecipient(recipient);
+        }
+        return recipient;
     }
 
     public List<NotificationRecord> getAllNotifications() {
