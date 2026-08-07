@@ -33,3 +33,4 @@ Welcome to the comprehensive reference and interview prep guide for this microse
 | **14** | [Modern Angular 18 Master Reference](file:///c:/SpringBoot/prep/14_angular_master_reference.md) | Lifecycle hooks, decorators, functional interceptors/guards, RxJS signals, `@defer`. |
 | **15** | [Production Troubleshooting Guide](file:///c:/SpringBoot/prep/15_production_troubleshooting_guide.md) | Top 10 multi-instance production failure scenarios, diagnostics, RCA, and fixes. |
 | **16** | [Architecture & End-to-End Build Steps](file:///c:/SpringBoot/prep/16_architecture_build_steps_guide.md) | High-level roadmap documenting every architectural decision and build phase. |
+| **17** | [Docker Containerization Mastery](file:///c:/SpringBoot/prep/17_docker_containerization_mastery.md) | Multi-stage Dockerfiles, Nginx SPA serving, Docker Compose orchestration, and gotchas. |
